@@ -36,5 +36,23 @@ namespace TalkerEnvControlsBETA
 
             relayValues[index-1] = (relayValues[index-1] == 0 ? 1 : 0);
         }
+
+        //IR remote control send codes
+        public void remoteControlSend(String remote,String remoteKey)
+        {
+            Process cmd = new Process();
+            cmd.StartInfo.FileName = @"C:\Program Files\PuTTY\plink.exe";
+            cmd.StartInfo.UseShellExecute = false;
+            cmd.StartInfo.RedirectStandardInput = true;
+            cmd.StartInfo.RedirectStandardOutput = true;
+            cmd.StartInfo.Arguments = "-ssh pi@192.168.1.11 -pw 9404CSE453 ";
+            cmd.StartInfo.CreateNoWindow = true;
+            cmd.Start();
+            cmd.StandardInput.WriteLine("irsend send_once "+remote+remoteKey);
+            cmd.StandardInput.WriteLine("exit");
+            string output = cmd.StandardOutput.ReadToEnd();
+
+        }
+    
     }
 }
