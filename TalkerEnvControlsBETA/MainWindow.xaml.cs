@@ -59,7 +59,10 @@ namespace TalkerEnvControlsBETA
             cc.relayControl(_t);
         }
 
-
+        private void OnClick1(object sender,RoutedEventArgs e)
+        {
+            relayControl(this, e);
+        }
 
         //using System.Timers
         public void runTimer()
@@ -120,6 +123,7 @@ namespace TalkerEnvControlsBETA
             Key k = e.Key;
             if (k == Key.Q)
             {
+                highlightedButton.Tag()
                 MethodInfo clickMethodInfo = typeof(Button).GetMethod("OnClick", BindingFlags.NonPublic | BindingFlags.Instance);
                 clickMethodInfo.Invoke(highlightedButton, new object[] { EventArgs.Empty });
             }
