@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Button = System.Windows.Controls.Button;
+using System.Windows.Automation.Peers;
 using System;
 using System.Reflection;
 
@@ -123,9 +124,10 @@ namespace TalkerEnvControlsBETA
             Key k = e.Key;
             if (k == Key.Q)
             {
-                highlightedButton.Tag()
-                MethodInfo clickMethodInfo = typeof(Button).GetMethod("OnClick", BindingFlags.NonPublic | BindingFlags.Instance);
-                clickMethodInfo.Invoke(highlightedButton, new object[] { EventArgs.Empty });
+               
+                highlightedButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+               
+                
             }
 
             if (k == Key.E)
