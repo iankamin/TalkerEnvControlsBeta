@@ -60,9 +60,9 @@ namespace TalkerEnvControlsBETA
             cc.relayControl(_t);
         }
 
-        private void OnClick1(object sender,RoutedEventArgs e)
+        private void powerControl(object sender,RoutedEventArgs e)
         {
-            relayControl(this, e);
+            cc.remoteControlSend("soundbar", "KEY_POWER");
         }
 
         //using System.Timers
@@ -126,7 +126,6 @@ namespace TalkerEnvControlsBETA
             {
                
                 highlightedButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-               
                 
             }
 

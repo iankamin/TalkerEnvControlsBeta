@@ -56,7 +56,7 @@
                 <TextBlock Grid.Row="1" Foreground="#FF00CFF3" FontSize="90" TextAlignment="Center" FontWeight="Bold"> Switch 3</TextBlock>
             </Grid>
         </Button>
-        <Button x:Name="power" Grid.Column="0" Grid.Row="3" Margin="50" BorderThickness="30" BorderBrush="Red" Foreground="{x:Null}" Background="Black">
+        <Button x:Name="power" Grid.Column="0" Grid.Row="3" Margin="50" BorderThickness="30" BorderBrush="Red" Foreground="{x:Null}" Background="Black" Click="powerControl">
             <Image Source="Resources/EnvControl_images/power-button-blue.png"/>
         </Button>
         <Button x:Name="volume" Grid.Column="1" Grid.Row="3" Margin="50" BorderThickness="30" BorderBrush="Red" Foreground="{x:Null}" Background="Black">
