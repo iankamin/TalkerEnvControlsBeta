@@ -46,15 +46,19 @@ namespace TalkerEnvControlsBETA
             cmd.StartInfo.RedirectStandardInput = true;
             cmd.StartInfo.RedirectStandardOutput = true;
             cmd.StartInfo.Arguments = "-ssh pi@192.168.1.11 -pw 9404CSE453 ";
-            cmd.StartInfo.CreateNoWindow = true;
+            cmd.StartInfo.CreateNoWindow = false;
             cmd.Start();
-            Thread.Sleep(10);
+            Thread.Sleep(200);
+            cmd.StandardInput.WriteLine('y');
+            Thread.Sleep(200);
             cmd.StandardInput.WriteLine("sudo systemctl stop lircd.service");
-            Thread.Sleep(10);
-            cmd.StandardInput.WriteLine("irsend send_once "+remote+" "+remoteKey);
+            Thread.Sleep(200);
+            cmd.StandardInput.WriteLine("irsend send_start "+ remote + " " + remoteKey);
+            Thread.Sleep(200);
+            cmd.StandardInput.WriteLine("irsend send_stop " + remote + " " + remoteKey);
+            Thread.Sleep(200);
             cmd.StandardInput.WriteLine("exit");
             string output = cmd.StandardOutput.ReadToEnd();
-
         }
     
     }

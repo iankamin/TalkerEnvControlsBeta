@@ -34,7 +34,7 @@ namespace TalkerEnvControlsBETA
            
             runTimer();
         }
-
+        //  creates a list from all buttons on the page
         private static void GetLogicalChildCollection<T>(DependencyObject parent, List<T> logicalCollection) where T : DependencyObject
         {
             IEnumerable children = LogicalTreeHelper.GetChildren(parent);
@@ -62,7 +62,7 @@ namespace TalkerEnvControlsBETA
 
         private void powerControl(object sender,RoutedEventArgs e)
         {
-            cc.remoteControlSend("soundbar", "KEY_POWER");
+            cc.remoteControlSend("STV", "KEY_POWER");
         }
 
         //using System.Timers
@@ -70,7 +70,7 @@ namespace TalkerEnvControlsBETA
         {
             aTimer = new Timer(1000);
 
-            aTimer.Elapsed += new ElapsedEventHandler(RunEvent);
+            aTimer.Elapsed += new ElapsedEventHandler(autoscaningButtons);
             aTimer.AutoReset = true;
             aTimer.Enabled = false;
             indexHighlighted = 0;
@@ -78,37 +78,38 @@ namespace TalkerEnvControlsBETA
 
         }
 
-        //This method will get called every second until the timer stops or the program exits.
-        public void RunEvent(object source, ElapsedEventArgs e)
+        // This method will get called by the timer until the timer stops or the program exits.
+        // it changes the currently highlighted button for autoscanning
+        public void autoscaningButtons(object source, ElapsedEventArgs e)
         {
+            // increments index for next button
+            if (indexHighlighted < listButtons.Count - 1) {   indexHighlighted++;   }
+            else  {   indexHighlighted = 0;  }
+
+            //currently highlighted button reverts to black background
             if (highlightedButton != null)
-            {
-                this.Dispatcher.Invoke(() =>
-                {
+            {   this.Dispatcher.Invoke(() =>  {
                     highlightedButton.Background = Brushes.Black;
                 });
             }
-
-            highlightedButton = listButtons[indexHighlighted];
-            this.Dispatcher.Invoke(() =>
-            {
+            // change to next highlighted button
+            highlightedButton = listButtons[indexHighlighted];    
+            this.Dispatcher.Invoke(() =>  {
                 highlightedButton.Background = Brushes.Red;
-            });
-            if (indexHighlighted < listButtons.Count - 1)
-            {
-                indexHighlighted++;
-            }
-            else
-            {
-                indexHighlighted = 0;
-            }
+            });            
         }
 
         private void Autoscan_Click(object sender, EventArgs e)
         {
             aTimer.Enabled = !aTimer.Enabled;
             // enable key listeners
-            layoutGrid.KeyDown += Key_down;
+            if (aTimer.Enabled)
+            {
+                layoutGrid.KeyDown += Key_down;
+            } else
+            {
+                layoutGrid.KeyDown -= Key_down;
+            }
             //restore the highlighted key to original color
             if (highlightedButton != null)
             {
@@ -124,14 +125,18 @@ namespace TalkerEnvControlsBETA
             Key k = e.Key;
             if (k == Key.Q)
             {
-               
-                highlightedButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                
+                indexHighlighted -= 2;
+                if (indexHighlighted < 0)
+                {
+                    aTimer.Stop();
+                    indexHighlighted += listButtons.Count;
+                    aTimer.Start();
+                }
             }
 
             if (k == Key.E)
             {
-            
+                highlightedButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             }
         }
     }
