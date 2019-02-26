@@ -6,13 +6,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Button = System.Windows.Controls.Button;
-using System.Windows.Automation.Peers;
 using System;
-using System.Reflection;
+using System.ComponentModel;
 
 namespace TalkerEnvControlsBETA
 {
@@ -22,17 +20,26 @@ namespace TalkerEnvControlsBETA
     public partial class MainWindow : Window
     {
         private ConsoleControls cc = new ConsoleControls();
-        private List<Button> listButtons = new List<Button>();
+        private List<Button> thisButtons = new List<Button>();
+        private List<Button> currentButtons = new List<Button>();
+
         private Timer aTimer;
         private Button highlightedButton;
         private int indexHighlighted;
 
+        Remote_popup rp = new Remote_popup();
+
         public MainWindow()
         {
             InitializeComponent();
-            GetLogicalChildCollection(this, listButtons);
-           
+            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+            GetLogicalChildCollection(this, thisButtons);
+            currentButtons = thisButtons;
             runTimer();
+
+            this.Closed += terminate_program;
+
         }
         //  creates a list from all buttons on the page
         private static void GetLogicalChildCollection<T>(DependencyObject parent, List<T> logicalCollection) where T : DependencyObject
@@ -50,6 +57,29 @@ namespace TalkerEnvControlsBETA
                     GetLogicalChildCollection(depChild, logicalCollection);
                 }
             }
+        }
+
+        private void Volume_Click(object sender, RoutedEventArgs e)
+        {
+           
+            rp.Show();
+            List<Button> temp = new List<Button>();
+            GetLogicalChildCollection(rp, temp);
+            currentButtons = temp;
+            rp.Closing += popup_closed;
+            rp.KeyDown += Key_down;
+            indexHighlighted = 0;
+        }
+        private void popup_closed(object sender, CancelEventArgs e)
+        {
+            currentButtons = thisButtons;
+            rp.KeyDown -= Key_down;
+            indexHighlighted = 0;
+
+            // Cancel Window closing 
+            e.Cancel = true;
+            // Hide Window instead
+            rp.Hide();
         }
 
         private void relayControl(object sender, RoutedEventArgs e)
@@ -83,7 +113,7 @@ namespace TalkerEnvControlsBETA
         public void autoscaningButtons(object source, ElapsedEventArgs e)
         {
             // increments index for next button
-            if (indexHighlighted < listButtons.Count - 1) {   indexHighlighted++;   }
+            if (indexHighlighted < currentButtons.Count - 1) {   indexHighlighted++;   }
             else  {   indexHighlighted = 0;  }
 
             //currently highlighted button reverts to black background
@@ -93,7 +123,7 @@ namespace TalkerEnvControlsBETA
                 });
             }
             // change to next highlighted button
-            highlightedButton = listButtons[indexHighlighted];    
+            highlightedButton = currentButtons[indexHighlighted];    
             this.Dispatcher.Invoke(() =>  {
                 highlightedButton.Background = Brushes.Red;
             });            
@@ -105,10 +135,11 @@ namespace TalkerEnvControlsBETA
             // enable key listeners
             if (aTimer.Enabled)
             {
-                layoutGrid.KeyDown += Key_down;
+                this.KeyDown += Key_down;
+
             } else
             {
-                layoutGrid.KeyDown -= Key_down;
+                this.KeyDown -= Key_down;
             }
             //restore the highlighted key to original color
             if (highlightedButton != null)
@@ -120,24 +151,34 @@ namespace TalkerEnvControlsBETA
             }
         }
 
+        // key press eventHandler
         private void Key_down(object sender, KeyEventArgs e)
         {
             Key k = e.Key;
-            if (k == Key.Q)
+            switch (k)
             {
-                indexHighlighted -= 2;
-                if (indexHighlighted < 0)
-                {
-                    aTimer.Stop();
-                    indexHighlighted += listButtons.Count;
-                    aTimer.Start();
-                }
+                case Key.Q:
+                    indexHighlighted -= 2;
+                    if (indexHighlighted < 0)
+                    {
+                        aTimer.Stop();
+                        indexHighlighted += currentButtons.Count;
+                        aTimer.Start();
+                    }
+                    break;
+                case Key.E:
+                    highlightedButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    break;
             }
 
-            if (k == Key.E)
-            {
-                highlightedButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            }
         }
+
+
+        private void terminate_program(object sender, EventArgs e)
+        {
+            App.Current.Shutdown();
+        }
+
+
     }
 }
